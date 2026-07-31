@@ -1,0 +1,93 @@
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ragarena"
+dynamic = ["version"]
+description = "Head-to-head benchmarking and evaluation for RAG pipelines: retrieval quality, answer faithfulness, latency and cost in one run."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+authors = [{ name = "Shahriar Ahmed Seam", email = "shahriarseam17@gmail.com" }]
+keywords = [
+    "rag",
+    "retrieval-augmented-generation",
+    "evaluation",
+    "benchmark",
+    "llm",
+    "embeddings",
+    "reranking",
+    "vector-search",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Testing",
+    "Typing :: Typed",
+]
+dependencies = [
+    "httpx>=0.27,<1.0",
+    "pydantic>=2.6,<3.0",
+    "numpy>=1.24",
+    "typer>=0.12,<1.0",
+    "rich>=13.7",
+    "jinja2>=3.1",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+local = ["fastembed>=0.4"]
+pgvector = ["psycopg[binary]>=3.1"]
+dev = [
+    "ruff>=0.6",
+    "mypy>=1.11",
+    "hatchling>=1.21",
+]
+all = [
+    "fastembed>=0.4",
+    "psycopg[binary]>=3.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/shahriarseam17/ragarena"
+Documentation = "https://ragarena.vercel.app"
+Repository = "https://github.com/shahriarseam17/ragarena"
+Issues = "https://github.com/shahriarseam17/ragarena/issues"
+Leaderboard = "https://ragarena.vercel.app"
+
+[project.scripts]
+ragarena = "ragarena.cli:main"
+
+[tool.hatch.version]
+path = "src/ragarena/_version.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ragarena"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/ragarena", "README.md", "LICENSE", "docs"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "C4", "SIM", "RUF"]
+ignore = ["E501", "B008", "RUF012"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_unused_ignores = false
+ignore_missing_imports = true
+disallow_untyped_defs = false

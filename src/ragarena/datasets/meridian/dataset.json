@@ -1,0 +1,5 @@
+{
+  "name": "meridian",
+  "version": "1.1",
+  "description": "Meridian Freight Systems: a synthetic internal knowledge base for a fictional logistics API company. Twenty documents spanning two API surfaces, SRE runbooks, two incident postmortems, security, retention, customs, returns, billing, finance, capacity planning, mobile and HR, with 78 labelled questions. Written from scratch for RAGArena, so it carries no licensing restrictions and cannot have leaked into any model's training data. Deliberately adversarial: the corpus contains competing near-identical facts (two rate limits, three request timeouts, two signature schemes, six retention windows, two retry policies), cross-document multi-hop questions, arithmetic questions, and 11 unanswerable questions whose vocabulary overlaps heavily with real content."
+}

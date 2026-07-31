@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RAGArena report - {{ run.dataset.name }} - {{ run.run_id }}</title>
+<style>
+  :root {
+    --bg: #0b0d10;
+    --panel: #14171c;
+    --panel-2: #1a1e25;
+    --line: #262c35;
+    --text: #e6e9ee;
+    --muted: #98a2b3;
+    --accent: #6ee7b7;
+    --accent-2: #60a5fa;
+    --warn: #fbbf24;
+    --bad: #f87171;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 40px 24px 80px; }
+  h1 { font-size: 28px; margin: 0 0 6px; letter-spacing: -0.02em; }
+  h2 { font-size: 19px; margin: 44px 0 14px; letter-spacing: -0.01em; }
+  h3 { font-size: 15px; margin: 22px 0 8px; color: var(--muted); font-weight: 600;
+       text-transform: uppercase; letter-spacing: 0.08em; }
+  p { color: var(--muted); margin: 0 0 12px; }
+  a { color: var(--accent-2); }
+  code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.9em; }
+  .sub { color: var(--muted); font-size: 13px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 0; }
+  .chip {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 999px;
+    padding: 5px 12px; font-size: 12.5px; color: var(--muted);
+  }
+  .chip b { color: var(--text); font-weight: 600; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-top: 20px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+  .card .k { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; }
+  .card .v { font-size: 26px; font-weight: 650; margin-top: 6px; letter-spacing: -0.02em; }
+  .card .n { font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th, td { text-align: right; padding: 9px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; white-space: normal; }
+  thead th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+  tbody tr:hover { background: var(--panel); }
+  .best { color: var(--accent); font-weight: 650; }
+  .worst { color: var(--bad); }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; overflow-x: auto; }
+  .bar { height: 8px; background: var(--panel-2); border-radius: 99px; overflow: hidden; min-width: 90px; }
+  .bar > i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent-2), var(--accent)); }
+  .rowlabel { display: flex; flex-direction: column; gap: 3px; }
+  .rowlabel small { color: var(--muted); font-size: 12px; }
+  details { border-top: 1px solid var(--line); padding: 12px 0; }
+  details > summary { cursor: pointer; font-weight: 600; }
+  details[open] > summary { color: var(--accent); }
+  .qa { border-left: 2px solid var(--line); padding: 4px 0 4px 14px; margin: 14px 0; }
+  .qa .q { font-weight: 600; }
+  .qa .a { color: var(--text); margin-top: 6px; white-space: pre-wrap; }
+  .qa .g { color: var(--muted); margin-top: 6px; font-size: 13px; }
+  .tag { display: inline-block; font-size: 11.5px; padding: 2px 8px; border-radius: 6px;
+         border: 1px solid var(--line); color: var(--muted); margin-right: 6px; }
+  .tag.ok { color: var(--accent); border-color: #1f5f47; }
+  .tag.no { color: var(--bad); border-color: #5f2626; }
+  footer { margin-top: 60px; color: var(--muted); font-size: 12.5px; border-top: 1px solid var(--line); padding-top: 18px; }
+  .scatter { width: 100%; height: 300px; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-top: 10px; }
+  .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: middle; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>RAGArena report</h1>
+  <p class="sub">
+    Dataset <b>{{ run.dataset.name }}</b> v{{ run.dataset.version }} &middot;
+    {{ run.dataset.n_documents }} documents, {{ "{:,}".format(run.dataset.total_words) }} words,
+    {{ run.dataset.n_questions }} labelled questions &middot;
+    run <code>{{ run.run_id }}</code> &middot; {{ run.created_at.strftime("%Y-%m-%d %H:%M UTC") }}
+  </p>
+
+  <div class="meta">
+    <span class="chip">generator <b>{{ run.environment.generator_model }}</b></span>
+    <span class="chip">judge <b>{{ run.environment.judge_model }}</b></span>
+    <span class="chip">embeddings <b>{{ run.environment.embed_model }}</b></span>
+    <span class="chip">reranker <b>{{ run.environment.rerank_model }}</b></span>
+    <span class="chip">strategies <b>{{ run.strategies|length }}</b></span>
+    <span class="chip">wall clock <b>{{ run.duration_s }}s</b></span>
+    <span class="chip">ragarena <b>{{ run.environment.ragarena_version }}</b></span>
+  </div>
+
+  {% set top = board[0] %}
+  {% set base = board[-1] %}
+  <div class="cards">
+    <div class="card">
+      <div class="k">Winner</div>
+      <div class="v">{{ top.label }}</div>
+      <div class="n">arena score {{ "%.3f"|format(top.metrics.get("arena_score", 0)) }}</div>
+    </div>
+    <div class="card">
+      <div class="k">Faithfulness</div>
+      <div class="v">{{ "%.1f%%"|format(100 * top.metrics.get("faithfulness", 0)) }}</div>
+      <div class="n">best strategy, claim-level</div>
+    </div>
+    <div class="card">
+      <div class="k">Answer correctness</div>
+      <div class="v">{{ "%.1f%%"|format(100 * top.metrics.get("answer_correctness", 0)) }}</div>
+      <div class="n">graded against reference answers</div>
+    </div>
+    <div class="card">
+      <div class="k">p95 latency</div>
+      <div class="v">{{ "%.0f"|format(top.latency.p95_ms) }} ms</div>
+      <div class="n">end to end, cold calls only</div>
+    </div>
+    <div class="card">
+      <div class="k">Cost / 1k queries</div>
+      <div class="v">${{ "%.2f"|format(top.cost_per_1k_queries_uncached_usd) }}</div>
+      <div class="n">serving only, no prompt-cache discount</div>
+    </div>
+    <div class="card">
+      <div class="k">Spread</div>
+      <div class="v">{{ "%+.1f"|format(100 * (top.metrics.get("arena_score", 0) - base.metrics.get("arena_score", 0))) }} pts</div>
+      <div class="n">best vs worst arena score</div>
+    </div>
+  </div>
+
+  <h2>Leaderboard</h2>
+  <p>
+    Ranked by <b>arena score</b>, a weighted composite:
+    {% for k, v in weights.items() %}{{ k }} {{ "%.0f%%"|format(100 * v) }}{{ ", " if not loop.last }}{% endfor %}.
+    Every strategy ran the identical question set against the identical corpus.
+  </p>
+  <div class="panel">
+    <table>
+      <thead>
+        <tr>
+          <th>Strategy</th>
+          <th>Arena</th>
+          <th></th>
+          <th>Faith.</th>
+          <th>Correct.</th>
+          <th>Ctx prec.</th>
+          <th>Hit@5</th>
+          <th>MRR</th>
+          <th>Cite valid.</th>
+          <th>Abstain</th>
+          <th>p50 ms</th>
+          <th>p95 ms</th>
+          <th title="Every prompt token priced at the cache-miss rate">$/1k</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for s in board %}
+        <tr>
+          <td>
+            <div class="rowlabel">
+              <span>{{ loop.index }}. {{ s.label }}</span>
+              <small>{{ s.description }}</small>
+            </div>
+          </td>
+          <td class="{{ 'best' if loop.first }}">{{ "%.3f"|format(s.metrics.get("arena_score", 0)) }}</td>
+          <td><div class="bar"><i style="width: {{ (100 * s.metrics.get('arena_score', 0))|round(1) }}%"></i></div></td>
+          <td>{{ "%.3f"|format(s.metrics.get("faithfulness", 0)) }}</td>
+          <td>{{ "%.3f"|format(s.metrics.get("answer_correctness", 0)) }}</td>
+          <td>{{ "%.3f"|format(s.metrics.get("context_precision", 0)) }}</td>
+          <td>{{ "%.3f"|format(s.metrics.get("hit_rate", 0)) }}</td>
+          <td>{{ "%.3f"|format(s.metrics.get("mrr", 0)) }}</td>
+          <td>{{ "%.3f"|format(s.metrics.get("citation_validity", 0)) }}</td>
+          <td>{{ "%.3f"|format(s.metrics.get("abstention_correct", 0)) }}</td>
+          <td>{{ "%.0f"|format(s.latency.p50_ms) }}</td>
+          <td>{{ "%.0f"|format(s.latency.p95_ms) }}</td>
+          <td>{{ "%.2f"|format(s.cost_per_1k_queries_uncached_usd) }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Quality against cost</h2>
+  <p>Up and to the left is better: higher arena score for fewer dollars per thousand queries.</p>
+  <div class="panel">
+    <svg class="scatter" viewBox="0 0 900 300" preserveAspectRatio="none" role="img"
+         aria-label="Scatter plot of arena score against cost per 1000 queries">
+      <line x1="60" y1="260" x2="880" y2="260" stroke="#262c35" />
+      <line x1="60" y1="20" x2="60" y2="260" stroke="#262c35" />
+      {% for p in scatter %}
+        <circle cx="{{ p.x }}" cy="{{ p.y }}" r="6" fill="{{ p.color }}" />
+        <text x="{{ p.x + 10 }}" y="{{ p.y + 4 }}" fill="#98a2b3" font-size="11">{{ p.label }}</text>
+      {% endfor %}
+      <text x="470" y="290" fill="#98a2b3" font-size="11" text-anchor="middle">cost per 1k queries (USD) &rarr;</text>
+      <text x="16" y="140" fill="#98a2b3" font-size="11" transform="rotate(-90 16 140)" text-anchor="middle">arena score &rarr;</text>
+    </svg>
+  </div>
+
+  <h2>Where the time goes</h2>
+  <p>Mean milliseconds per stage, cold calls only. Reranking and query expansion buy quality with latency.</p>
+  <div class="panel">
+    <table>
+      <thead>
+        <tr><th>Strategy</th><th>Embed query</th><th>Retrieve</th><th>Rerank</th><th>Generate</th><th>Total p50</th></tr>
+      </thead>
+      <tbody>
+      {% for s in board %}
+        <tr>
+          <td>{{ s.label }}</td>
+          <td>{{ "%.0f"|format(s.stage_latency.get("embed_query_ms", 0)) }}</td>
+          <td>{{ "%.0f"|format(s.stage_latency.get("retrieve_ms", 0)) }}</td>
+          <td>{{ "%.0f"|format(s.stage_latency.get("rerank_ms", 0)) }}</td>
+          <td>{{ "%.0f"|format(s.stage_latency.get("generate_ms", 0)) }}</td>
+          <td>{{ "%.0f"|format(s.latency.p50_ms) }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Behaviour by question type</h2>
+  <p>
+    Averages hide the interesting failures. Multi-hop and unanswerable questions are where
+    strategies actually separate.
+  </p>
+  <div class="panel">
+    <table>
+      <thead>
+        <tr>
+          <th>Strategy</th>
+          {% for seg in segments %}<th>{{ seg.replace("type:", "").replace("_", " ") }}</th>{% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+      {% for s in board %}
+        <tr>
+          <td>{{ s.label }}</td>
+          {% for seg in segments %}
+            {% set data = s.metrics_by_segment.get(seg, {}) %}
+            <td>
+              {% if seg == "unanswerable" %}
+                {{ "%.2f"|format(data.get("abstention_correct", 0)) }}
+              {% else %}
+                {{ "%.2f"|format(data.get("arena_score", 0)) }}
+              {% endif %}
+            </td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--accent)"></span>arena score per segment; the unanswerable column shows abstention accuracy</span>
+    </div>
+  </div>
+
+  <h2>Answer inspection: {{ top.label }}</h2>
+  <p>Every question the winning strategy answered, with the claims the judge could not ground.</p>
+  <div class="panel">
+    {% for t in top.traces %}
+      <details>
+        <summary>
+          {{ t.question }}
+          {% if t.error %}<span class="tag no">error</span>
+          {% else %}
+            {% if t.scores.get("faithfulness") is not none %}
+              <span class="tag {{ 'ok' if t.scores.get('faithfulness', 0) >= 0.999 else 'no' }}">
+                faith {{ "%.2f"|format(t.scores.get("faithfulness", 0)) }}
+              </span>
+            {% endif %}
+            {% if not t.answerable %}
+              <span class="tag {{ 'ok' if t.scores.get('abstention_correct', 0) == 1 else 'no' }}">
+                {{ "abstained" if t.answer and t.answer.abstained else "answered anyway" }}
+              </span>
+            {% endif %}
+          {% endif %}
+        </summary>
+        <div class="qa">
+          {% if t.error %}
+            <div class="a">{{ t.error }}</div>
+          {% else %}
+            <div class="a">{{ t.answer.text if t.answer else "(no answer)" }}</div>
+            {% if t.ground_truth %}<div class="g"><b>Reference:</b> {{ t.ground_truth }}</div>{% endif %}
+            {% if t.judge_notes.get("grounding") %}
+              <div class="g"><b>Grounding:</b> {{ t.judge_notes.get("grounding") }}</div>
+            {% endif %}
+            {% if t.judge_notes.get("quality") %}
+              <div class="g"><b>Judge:</b> {{ t.judge_notes.get("quality") }}</div>
+            {% endif %}
+            <div class="g">
+              <b>Retrieved:</b>
+              {% for c in t.retrieved %}<span class="tag">[{{ c.rank }}] {{ c.doc_id }}</span>{% endfor %}
+            </div>
+            <div class="g">
+              {{ "%.0f"|format(t.timings.total_ms) }} ms &middot;
+              ${{ "%.5f"|format(t.cost.total_usd) }} &middot;
+              {{ t.usage.prompt_tokens + t.usage.completion_tokens }} tokens
+            </div>
+          {% endif %}
+        </div>
+      </details>
+    {% endfor %}
+  </div>
+
+  <h2>Full metric matrix</h2>
+  <div class="panel">
+    <table>
+      <thead>
+        <tr><th>Metric</th>{% for s in board %}<th>{{ s.name }}</th>{% endfor %}</tr>
+      </thead>
+      <tbody>
+      {% for metric in metric_rows %}
+        <tr>
+          <td>{{ metric }}</td>
+          {% for s in board %}
+            <td>{{ "%.3f"|format(s.metrics.get(metric, 0)) if metric in s.metrics else "&mdash;"|safe }}</td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+        <tr>
+          <td>chunks indexed</td>
+          {% for s in board %}<td>{{ s.n_chunks }}</td>{% endfor %}
+        </tr>
+        <tr>
+          <td>errors</td>
+          {% for s in board %}<td>{{ s.n_errors }}</td>{% endfor %}
+        </tr>
+        <tr>
+          <td>eval cost (USD)</td>
+          {% for s in board %}<td>{{ "%.4f"|format(s.eval_cost_usd) }}</td>{% endfor %}
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer>
+    <p>
+      Generated by <b>RAGArena {{ run.environment.ragarena_version }}</b> on
+      Python {{ run.environment.python_version }} / {{ run.environment.platform }}.
+      {% if run.notes %}<br />{{ run.notes }}{% endif %}
+    </p>
+    <p>
+      Latency percentiles exclude cache hits and were measured at concurrency
+      {{ run.environment.concurrency }} against the <code>{{ run.environment.index_backend }}</code>
+      index; CPU-bound local models contend with each other under parallelism, so read the
+      absolute milliseconds with that in mind. Serving cost covers query embedding, reranking,
+      query transformation and answer generation; judging is billed separately and shown in the
+      matrix above.
+      {% if unpriced %}<br />No published price found for: {{ unpriced|join(", ") }}. Cost for those is reported as zero.{% endif %}
+    </p>
+  </footer>
+</div>
+</body>
+</html>

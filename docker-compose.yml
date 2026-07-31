@@ -1,0 +1,48 @@
+services:
+  ragarena:
+    build: .
+    image: ragarena:local
+    env_file:
+      - .env
+    environment:
+      RAGARENA_CACHE_DIR: /data/cache
+      # Point at the pgvector service below to benchmark the production index.
+      DATABASE_URL: postgresql://ragarena:ragarena@postgres:5432/ragarena
+    volumes:
+      - ./results:/work/results
+      - ragarena-cache:/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # Override at the command line, e.g.
+    #   docker compose run --rm ragarena bench --suite default --index pgvector
+    command:
+      - bench
+      - --suite
+      - quick
+      - --embed-provider
+      - fastembed
+      - --rerank-provider
+      - crossencoder
+      - --out
+      - /work/results
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: ragarena
+      POSTGRES_PASSWORD: ragarena
+      POSTGRES_DB: ragarena
+    ports:
+      - "5433:5432"
+    volumes:
+      - ragarena-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ragarena -d ragarena"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  ragarena-cache:
+  ragarena-pgdata:

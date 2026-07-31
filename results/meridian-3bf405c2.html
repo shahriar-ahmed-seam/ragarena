@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RAGArena report - meridian - meridian-3bf405c2</title>
+<style>
+  :root {
+    --bg: #0b0d10;
+    --panel: #14171c;
+    --panel-2: #1a1e25;
+    --line: #262c35;
+    --text: #e6e9ee;
+    --muted: #98a2b3;
+    --accent: #6ee7b7;
+    --accent-2: #60a5fa;
+    --warn: #fbbf24;
+    --bad: #f87171;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 40px 24px 80px; }
+  h1 { font-size: 28px; margin: 0 0 6px; letter-spacing: -0.02em; }
+  h2 { font-size: 19px; margin: 44px 0 14px; letter-spacing: -0.01em; }
+  h3 { font-size: 15px; margin: 22px 0 8px; color: var(--muted); font-weight: 600;
+       text-transform: uppercase; letter-spacing: 0.08em; }
+  p { color: var(--muted); margin: 0 0 12px; }
+  a { color: var(--accent-2); }
+  code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.9em; }
+  .sub { color: var(--muted); font-size: 13px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 0; }
+  .chip {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 999px;
+    padding: 5px 12px; font-size: 12.5px; color: var(--muted);
+  }
+  .chip b { color: var(--text); font-weight: 600; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-top: 20px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+  .card .k { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; }
+  .card .v { font-size: 26px; font-weight: 650; margin-top: 6px; letter-spacing: -0.02em; }
+  .card .n { font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th, td { text-align: right; padding: 9px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; white-space: normal; }
+  thead th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+  tbody tr:hover { background: var(--panel); }
+  .best { color: var(--accent); font-weight: 650; }
+  .worst { color: var(--bad); }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; overflow-x: auto; }
+  .bar { height: 8px; background: var(--panel-2); border-radius: 99px; overflow: hidden; min-width: 90px; }
+  .bar > i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent-2), var(--accent)); }
+  .rowlabel { display: flex; flex-direction: column; gap: 3px; }
+  .rowlabel small { color: var(--muted); font-size: 12px; }
+  details { border-top: 1px solid var(--line); padding: 12px 0; }
+  details > summary { cursor: pointer; font-weight: 600; }
+  details[open] > summary { color: var(--accent); }
+  .qa { border-left: 2px solid var(--line); padding: 4px 0 4px 14px; margin: 14px 0; }
+  .qa .q { font-weight: 600; }
+  .qa .a { color: var(--text); margin-top: 6px; white-space: pre-wrap; }
+  .qa .g { color: var(--muted); margin-top: 6px; font-size: 13px; }
+  .tag { display: inline-block; font-size: 11.5px; padding: 2px 8px; border-radius: 6px;
+         border: 1px solid var(--line); color: var(--muted); margin-right: 6px; }
+  .tag.ok { color: var(--accent); border-color: #1f5f47; }
+  .tag.no { color: var(--bad); border-color: #5f2626; }
+  footer { margin-top: 60px; color: var(--muted); font-size: 12.5px; border-top: 1px solid var(--line); padding-top: 18px; }
+  .scatter { width: 100%; height: 300px; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-top: 10px; }
+  .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: middle; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>RAGArena report</h1>
+  <p class="sub">
+    Dataset <b>meridian</b> v1.1 &middot;
+    20 documents, 7,088 words,
+    78 labelled questions &middot;
+    run <code>meridian-3bf405c2</code> &middot; 2026-07-31 02:08 UTC
+  </p>
+
+  <div class="meta">
+    <span class="chip">generator <b>deepseek-v4-flash</b></span>
+    <span class="chip">judge <b>deepseek-v4-pro</b></span>
+    <span class="chip">embeddings <b>BAAI/bge-small-en-v1.5</b></span>
+    <span class="chip">reranker <b>none</b></span>
+    <span class="chip">strategies <b>2</b></span>
+    <span class="chip">wall clock <b>142.86s</b></span>
+    <span class="chip">ragarena <b>0.1.0</b></span>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="k">Winner</div>
+      <div class="v">Hybrid + RRF</div>
+      <div class="n">arena score 0.948</div>
+    </div>
+    <div class="card">
+      <div class="k">Faithfulness</div>
+      <div class="v">96.2%</div>
+      <div class="n">best strategy, claim-level</div>
+    </div>
+    <div class="card">
+      <div class="k">Answer correctness</div>
+      <div class="v">94.2%</div>
+      <div class="n">graded against reference answers</div>
+    </div>
+    <div class="card">
+      <div class="k">p95 latency</div>
+      <div class="v">1765 ms</div>
+      <div class="n">end to end, cold calls only</div>
+    </div>
+    <div class="card">
+      <div class="k">Cost / 1k queries</div>
+      <div class="v">$0.10</div>
+      <div class="n">serving only, no prompt-cache discount</div>
+    </div>
+    <div class="card">
+      <div class="k">Spread</div>
+      <div class="v">+0.9 pts</div>
+      <div class="n">best vs worst arena score</div>
+    </div>
+  </div>
+
+  <h2>Leaderboard</h2>
+  <p>
+    Ranked by <b>arena score</b>, a weighted composite:
+faithfulness 35%, answer_correctness 25%, context_precision 20%, citation_validity 10%, abstention_correct 10%.
+    Every strategy ran the identical question set against the identical corpus.
+  </p>
+  <div class="panel">
+    <table>
+      <thead>
+        <tr>
+          <th>Strategy</th>
+          <th>Arena</th>
+          <th></th>
+          <th>Faith.</th>
+          <th>Correct.</th>
+          <th>Ctx prec.</th>
+          <th>Hit@5</th>
+          <th>MRR</th>
+          <th>Cite valid.</th>
+          <th>Abstain</th>
+          <th>p50 ms</th>
+          <th>p95 ms</th>
+          <th title="Every prompt token priced at the cache-miss rate">$/1k</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="rowlabel">
+              <span>1. Hybrid + RRF</span>
+              <small>BM25 and dense results fused with Reciprocal Rank Fusion.</small>
+            </div>
+          </td>
+          <td class="best">0.948</td>
+          <td><div class="bar"><i style="width: 94.8%"></i></div></td>
+          <td>0.962</td>
+          <td>0.942</td>
+          <td>0.894</td>
+          <td>1.000</td>
+          <td>0.962</td>
+          <td>0.968</td>
+          <td>1.000</td>
+          <td>1397</td>
+          <td>1765</td>
+          <td>0.10</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="rowlabel">
+              <span>2. Dense only</span>
+              <small>Single-vector cosine search over the whole corpus.</small>
+            </div>
+          </td>
+          <td class="">0.939</td>
+          <td><div class="bar"><i style="width: 93.9%"></i></div></td>
+          <td>0.974</td>
+          <td>0.952</td>
+          <td>0.809</td>
+          <td>1.000</td>
+          <td>0.897</td>
+          <td>0.981</td>
+          <td>1.000</td>
+          <td>1400</td>
+          <td>1867</td>
+          <td>0.11</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Quality against cost</h2>
+  <p>Up and to the left is better: higher arena score for fewer dollars per thousand queries.</p>
+  <div class="panel">
+    <svg class="scatter" viewBox="0 0 900 300" preserveAspectRatio="none" role="img"
+         aria-label="Scatter plot of arena score against cost per 1000 queries">
+      <line x1="60" y1="260" x2="880" y2="260" stroke="#262c35" />
+      <line x1="60" y1="20" x2="60" y2="260" stroke="#262c35" />
+        <circle cx="90.0" cy="40.0" r="6" fill="#6ee7b7" />
+        <text x="100.0" y="44.0" fill="#98a2b3" font-size="11">hybrid-rrf</text>
+        <circle cx="790.0" cy="250.0" r="6" fill="#60a5fa" />
+        <text x="800.0" y="254.0" fill="#98a2b3" font-size="11">dense-only</text>
+      <text x="470" y="290" fill="#98a2b3" font-size="11" text-anchor="middle">cost per 1k queries (USD) &rarr;</text>
+      <text x="16" y="140" fill="#98a2b3" font-size="11" transform="rotate(-90 16 140)" text-anchor="middle">arena score &rarr;</text>
+    </svg>
+  </div>
+
+  <h2>Where the time goes</h2>
+  <p>Mean milliseconds per stage, cold calls only. Reranking and query expansion buy quality with latency.</p>
+  <div class="panel">
+    <table>
+      <thead>
+        <tr><th>Strategy</th><th>Embed query</th><th>Retrieve</th><th>Rerank</th><th>Generate</th><th>Total p50</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Hybrid + RRF</td>
+          <td>9</td>
+          <td>10</td>
+          <td>0</td>
+          <td>1417</td>
+          <td>1397</td>
+        </tr>
+        <tr>
+          <td>Dense only</td>
+          <td>9</td>
+          <td>10</td>
+          <td>0</td>
+          <td>1392</td>
+          <td>1400</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Behaviour by question type</h2>
+  <p>
+    Averages hide the interesting failures. Multi-hop and unanswerable questions are where
+    strategies actually separate.
+  </p>
+  <div class="panel">
+    <table>
+      <thead>
+        <tr>
+          <th>Strategy</th>
+<th>comparison</th><th>factoid</th><th>multi hop</th><th>numeric</th>        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Hybrid + RRF</td>
+            <td>
+                0.99
+            </td>
+            <td>
+                0.98
+            </td>
+            <td>
+                0.90
+            </td>
+            <td>
+                0.94
+            </td>
+        </tr>
+        <tr>
+          <td>Dense only</td>
+            <td>
+                0.97
+            </td>
+            <td>
+                0.97
+            </td>
+            <td>
+                0.87
+            </td>
+            <td>
+                0.94
+            </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="legend">
+      <span><span class="swatch" style="background:var(--accent)"></span>arena score per segment; the unanswerable column shows abstention accuracy</span>
+    </div>
+  </div>
+
+  <h2>Answer inspection: Hybrid + RRF</h2>
+  <p>Every question the winning strategy answered, with the claims the judge could not ground.</p>
+  <div class="panel">
+      <details>
+        <summary>
+          What is the rate limit for a single Shipments API key?
+              <span class="tag ok">
+                faith 1.00
+              </span>
+        </summary>
+        <div class="qa">
+            <div class="a">600 requests per minute with a burst allowance of 100 requests [1].</div>
+<div class="g"><b>Reference:</b> 600 requests per minute per API key, with a burst allowance of 100 requests. Exceeding it returns 429 rate_limited with a Retry-After header.</div>              <div class="g"><b>Grounding:</b> all claims supported</div>
+              <div class="g"><b>Judge:</b> The generated answer matches the reference answer exactly, only omitting the error response details which are minor.</div>
+            <div class="g">
+              <b>Retrieved:</b>
+<span class="tag">[1] api-shipments</span><span class="tag">[2] api-partner-integrations</span><span class="tag">[3] api-shipments</span><span class="tag">[4] observability-standards</span><span class="tag">[5] api-partner-integrations</span>            </div>
+            <div class="g">
+              954 ms &middot;
+              $0.00010 &middot;
+              705 tokens
+            </div>
+        </div>
+      </details>
+      <details>
+        <summary>
+          How long does Meridian keep an Idempotency-Key before it stops deduplicating?
+              <span class="tag ok">
+                faith 1.00
+              </span>
+        </summary>
+        <div class="qa">
+            <div class="a">Partner Integration API keys are retained for 6 hours [1]; Shipments API keys are retained for 24 hours [2].</div>
+<div class="g"><b>Reference:</b> Idempotency keys are retained for 24 hours. Replaying the same key within that window returns the original response instead of creating a duplicate shipment.</div>              <div class="g"><b>Grounding:</b> all claims supported</div>
+              <div class="g"><b>Judge:</b> The answer addresses the question by specifying retention times for different API keys, but it adds extra detail about Partner Integration API keys not present in the reference, which is a minor omission from the reference&#39;s singular focus on 24 hours.</div>
+            <div class="g">
+              <b>Retrieved:</b>
+<span class="tag">[1] api-partner-integrations</span><span class="tag">[2] api-shipments</span><span class="tag">[3] carrier-callbacks</span><span class="tag">[4] onboarding-engineering</span><span class="tag">[5] oncall-runbook</span>            </div>
+            <div class="g">
+              1488 ms &middot;
+              $0.00008 &middot;
+              513 tokens
+            </div>
+        </div>
+      </details>
+      <details>
+        <summary>
+          Which shipment statuses still allow a cancellation, and what happens if I try later?
+              <span class="tag ok">
+                faith 1.00
+              </span>
+        </summary>
+        <div class="qa">
+            <div class="a">Cancellation is allowed only in `draft` or `booked` statuses [1]. If you try to cancel after the shipment reaches `in_transit`, the endpoint returns `409 not_cancellable` and the shipment must be handled as a return [1].</div>
+<div class="g"><b>Reference:</b> Cancellation works only while the shipment is in draft or booked. Once it reaches in_transit the cancel endpoint returns 409 not_cancellable and it has to be handled as a return.</div>              <div class="g"><b>Grounding:</b> all claims supported</div>
+              <div class="g"><b>Judge:</b> The answer fully addresses the question and matches the reference answer exactly.</div>
+            <div class="g">
+              <b>Retrieved:</b>
+<span class="tag">[1] api-shipments</span><span class="tag">[2] pricing-billing</span><span class="tag">[3] returns-policy</span><span class="tag">[4] api-webhooks</span><span class="tag">[5] finance-operations</span>            </div>
+            <div class="g">
+              1447 ms &middot;
+              $0.00011 &middot;
+              727 tokens
+            </div>
+        </div>
+      </details>
+      <details>
+        <summary>
+          What is the maximum number of line items on one shipment?
+              <span class="tag ok">
+                faith 1.00
+              </span>
+        </summary>
+        <div class="qa">
+            <div class="a">A single shipment accepts at most 250 line items [1].</div>
+<div class="g"><b>Reference:</b> 250 line items. Larger manifests must be split across multiple shipments.</div>              <div class="g"><b>Grounding:</b> all claims supported</div>
+              <div class="g"><b>Judge:</b> The generated answer directly states the maximum of 250 line items, matching the reference answer exactly.</div>
+            <div class="g">
+              <b>Retrieved:</b>
+<span class="tag">[1] api-shipments</span><span class="tag">[2] pricing-billing</span><span class="tag">[3] customs-compliance</span><span class="tag">[4] api-shipments</span><span class="tag">[5] pricing-billing</span>            </div>
+            <div class="g">
+              1315 ms &middot;
+              $0.00009 &middot;
+              661 tokens
+            </div>
+        </div>
+      </details>
+      <details>
+        <summary>
+          What is the maximum page size when listing shipments, and what is the default?
+              <span class="tag ok">
+                faith 1.00
+              </span>
+        </summary>
+        <div class="qa">
+            <div class="a">The maximum page size is 200, and the default is 50 [1].</div>
+<div class="g"><b>Reference:</b> The limit parameter defaults to 50 and accepts a maximum of 200. Pagination is cursor-based; offset pagination is not supported.</div>              <div class="g"><b>Grounding:</b> all claims supported</div>
+              <div class="g"><b>Judge:</b> The answer correctly states the maximum page size is 200 and the default is 50, matching the reference.</div>
+            <div class="g">
+              <b>Retrieved:</b>
+<span class="tag">[1] api-shipments</span><span class="tag">[2] observability-standards</span><span class="tag">[3] observability-standards</span><span class="tag">[4] api-partner-integrations</span><span class="tag">[5] postmortem-queue-backlog</span>            </div>
+            <div class="g">
+              1400 ms &middot;
+              $0.00009 &middot;
+              632 tokens
+            </div>
+        </div>
+      </details>
+      <details>
+        <summary>
+          How many times is a failed webhook delivery retried and for how long?
+              <span class="tag ok">
+                faith 1.00
+              </span>
+        </summary>
+        <div class="qa">
+            <div class="a">A failed webhook delivery is retried up to 8 times [1]. Retries stop once the total delivery window of 24 hours has elapsed [1].</div>
+<div class="g"><b>Reference:</b> Up to 8 retries with exponential backoff starting at 10 seconds and capped at a 6 hour interval, stopping once the 24 hour total delivery window elapses.</div>              <div class="g"><b>Grounding:</b> all claims supported</div>
+              <div class="g"><b>Judge:</b> The answer correctly states the number of retries and the 24-hour window, but omits the exponential backoff details (starting at 10 seconds, capped at 6 hours).</div>
+            <div class="g">
+              <b>Retrieved:</b>
+<span class="tag">[1] api-webhooks</span><span class="tag">[2] pricing-billing</span><span class="tag">[3] postmortem-queue-backlog</span><span class="tag">[4] postmortem-queue-backlog</span><span class="tag">[5] carrier-callbacks</span>            </div>
+            <div class="g">
+              1490 ms &middot;
+              $0.00010 &middot;
+              703 tokens
+            </div>
+        </div>
+      </details>
+      <details>
+        <summary>
+          How do I verify a webhook signature, and what is the replay tolerance?
+              <span class="tag ok">
+                faith 1.00
+              </span>
+        </summary>
+        <div class="qa">
+            <div class="a">Verify the signature by computing hex-encoded HMAC-SHA256 over the raw request body using your endpoint&#39;s signing secret, and check the `X-MFS-Signature` header against it [2]. Reject deliveries whose `X-MFS-Timestamp` is more than 5 minutes from your clock; that is the replay tolerance [2].</div>
+<div class="g"><b>Reference:</b> Compute a hex-encoded HMAC-SHA256 over the raw request body using the endpoint signing secret and compare it to X-MFS-Signature. Reject deliveries whose X-MFS-Timestamp is more than 5 minutes from your clock.</div>              <div class="g"><b>Grounding:</b> all claims supported</div>
+              <div class="g"><b>Judge:</b> The generated answer fully addresses the question and matches the reference answer exactly.</div>
+            <div class="g">
+              <b>Retrieved:</b>
+<span class="tag">[1] carrier-callbacks</span><span class="tag">[2] api-webhooks</span><span class="tag">[3] api-webhooks</span><span class="tag">[4] mobile-driver-app</span><span class="tag">[5] finance-operations</span>            </div>
+            <div class="g">
+              1765 ms &middot;
+              $0.00012 &middot;
+              792 tokens
+            </div>
+        </div>
+      </details>
+      <details>
+        <summary>
+          After how many consecutive failures does Meridian disable a webhook endpoint, and who is notified?
+              <span class="tag ok">
+                faith 1.00
+              </span>
+        </summary>
+        <div class="qa">
+            <div class="a">A webhook endpoint is disabled after 100 consecutive failed deliveries [1]. All workspace owners are notified by email [1].</div>
+<div class="g"><b>Reference:</b> After 100 consecutive failed deliveries the endpoint is disabled automatically, all workspace owners are emailed, and it must be re-enabled manually from the dashboard.</div>              <div class="g"><b>Grounding:</b> all claims supported</div>
+              <div class="g"><b>Judge:</b> The answer fully addresses the question and matches the reference, including the threshold and notification details.</div>
+            <div class="g">
+              <b>Retrieved:</b>
+<span class="tag">[1] api-webhooks</span><span class="tag">[2] carrier-callbacks</span><span class="tag">[3] carrier-callbacks</span><span class="tag">[4] postmortem-queue-backlog</span><span class="tag">[5] carrier-callbacks</span>            </div>
+            <div class="g">
+              1728 ms &middot;
+              $0.00010 &middot;
+              693 tokens
+            </div>
+        </div>
+      </details>
+      <details>
+        <summary>
+          How long do both webhook secrets stay valid after I rotate the signing secret?
+              <span class="tag ok">
+                faith 1.00
+              </span>
+        </summary>
+        <div class="qa">
+            <div class="a">Both the old and the new signing secret stay valid for 24 hours after a rotation [1].</div>
+<div class="g"><b>Reference:</b> Both the old and the new signing secret remain valid for 24 hours after a rotation, so the change can be rolled out without dropping deliveries.</div>              <div class="g"><b>Grounding:</b> all claims supported</div>
+              <div class="g"><b>Judge:</b> The answer directly addresses the question and matches the reference answer exactly, stating the 24-hour validity period.</div>
+            <div class="g">
+              <b>Retrieved:</b>
+<span class="tag">[1] api-webhooks</span><span class="tag">[2] api-partner-integrations</span><span class="tag">[3] data-retention</span><span class="tag">[4] pricing-billing</span><span class="tag">[5] security-access-policy</span>            </div>
+            <div class="g">
+              1364 ms &middot;
+              $0.00012 &middot;
+              805 tokens
+            </div>
+        </div>
+      </details>
+      <details>
+        <summary>
+          How far back can I replay webhook events, and is there a per-request cap?
+              <span class="tag ok">
+                faith 1.00
+              </span>
+        </summary>
+        <div class="qa">
+            <div class="a">Replay covers up to 7 days of event history, and the per-request cap is 10,000 events [1].</div>
+<div class="g"><b>Reference:</b> Replay covers up to 7 days of event history and is limited to 10,000 events per request. Replayed deliveries carry the X-MFS-Replay: true header.</div>              <div class="g"><b>Grounding:</b> all claims supported</div>
+              <div class="g"><b>Judge:</b> The generated answer directly addresses both parts of the question and matches the reference answer exactly.</div>
+            <div class="g">
+              <b>Retrieved:</b>
+<span class="tag">[1] api-webhooks</span><span class="tag">[2] postmortem-queue-backlog</span><span class="tag">[3] observability-standards</span><span class="tag">[4] postmortem-queue-backlog</span><span class="tag">[5] api-shipments</span>            </div>
+            <div class="g">
+              1503 ms &middot;
+              $0.00009 &middot;
+              630 tokens
+            </div>
+        </div>
+      </details>
+      <details>
+        <summary>
+          What uptime does the Business tier commit to, and what does Enterprise commit to?
+              <span class="tag ok">
+                faith 1.00
+              </span>
+        </summary>
+        <div class="qa">
+            <div class="a">Business tier commits to 99.9% monthly uptime [3]. Enterprise commits to 99.95% [3].</div>
+<div class="g"><b>Reference:</b> Business commits to 99.9% monthly uptime and Enterprise to 99.95%.</div>              <div class="g"><b>Grounding:</b> all claims supported</div>
+              <div class="g"><b>Judge:</b> The answer directly provides the exact uptime commitments for both tiers, matching the reference answer.</div>
+            <div class="g">
+              <b>Retrieved:</b>
+<span class="tag">[1] sla-support-tiers</span><span class="tag">[2] sla-support-tiers</span><span class="tag">[3] sla-support-tiers</span><span class="tag">[4] pricing-billing</span><span class="tag">[5] sla-support-tiers</span>            </div>
+            <div class="g">
+              1895 ms &middot;
+              $0.00008 &middot;
+              521 tokens
+            </div>
+        </div>
+      </details>
+      <details>
+        <summary>
+          If monthly uptime comes in at 98.4%, what service credit can a customer claim?
+              <span class="tag no">
+                faith 0.00
+              </span>
+        </summary>
+        <div class="qa">
+            <div class="a">A 25% credit applies, because 98.4% is below 99.0% but at or above 95.0% [1].</div>
+<div class="g"><b>Reference:</b> 25% of the monthly platform fee, because 98.4% falls below 99.0% but at or above 95.0%.</div>              <div class="g"><b>Grounding:</b> A 25% credit applies.; 98.4% is below 99.0% but at or above 95.0%.</div>
+              <div class="g"><b>Judge:</b> The generated answer correctly states the 25% credit and the uptime range, matching the reference answer.</div>
+            <div class="g">
+              <b>Retrieved:</b>
+<span class="tag">[1] sla-support-tiers</span><span class="tag">[2] sla-support-tiers</span><span class="tag">[3] finance-operations</span><span class="tag">[4] postmortem-tls-expiry</span><span class="tag">[5] security-access-policy</span>            </div>
+            <div class="g">
+              1064 ms &middot;
+              $0.00007 &middot;
+              730 tokens
+            </div>
+        </div>
+      </details>
+      <details>
+        <summary>
+          What is the deadline for submitting a service credit claim?
+              <span class="tag ok">
+                faith 1.00
+              </span>
+        </summary>
+        <div class="qa">
+            <div class="a">The claim must be submitted within 30 days of the end of the affected month; claims after that window are not honored [1].</div>
+<div class="g"><b>Reference:</b> Within 30 days of the end of the affected month. Later claims are not honoured.</div>              <div class="g"><b>Grounding:</b> all claims supported</div>
+              <div class="g"><b>Judge:</b> The answer fully addresses the question and matches the reference answer exactly.</div>
+            <div class="g">
+              <b>Retrieved:</b>
+<span class="tag">[1] sla-support-tiers</span><span class="tag">[2] finance-operations</span><span class="tag">[3] postmortem-tls-expiry</span><span class="tag">[4] security-access-policy</span><span class="tag">[5] finance-operations</span>            </div>
+            <div class="g">
+              1199 ms &middot;
+              $0.00007 &middot;
+              741 tokens
+            </div>
+        </div>
+      </details>
+      <details>
+        <summary>
+          Compare the first response targets for Business and Enterprise support.
+              <span class="tag ok">
+                faith 1.00
+              </span>
+        </summary>
+        <div class="qa">
+            <div class="a">Business targets a 2-hour first response, while Enterprise targets 30 minutes [1]. Both apply 24 hours a day, every day [1].</div>
+<div class="g"><b>Reference:</b> Business is 2 hours and Enterprise is 30 minutes, both measured to a substantive human reply and both applying 24 hours a day.</div>              <div class="g"><b>Grounding:</b> all claims supported</div>
+              <div class="g"><b>Judge:</b> The answer fully addresses the question and matches the reference answer, including the specific times and 24/7 applicability.</div>
+            <div class="g">
+              <b>Retrieved:</b>
+<span class="tag">[1] sla-support-tiers</span><span class="tag">[2] sla-support-tiers</span><span class="tag">[3] onboarding-engineering</span><span class="tag">[4] sla-support-tiers</span><span class="tag">[5] oncall-runbook</span>            </div>
+            <div class="g">
+              1641 ms &middot;
+              $0.00007 &middot;
+              461 tokens
+            </div>
+        </div>
+      </details>
+      <details>
+        <summary>
+          How long are shipment records kept, and can a customer ask for them to be deleted sooner?
+              <span class="tag ok">
+                faith 1.00
+              </span>
+        </summary>
+        <div class="qa">
+            <div class="a">Shipment records are retained for 7 years after the shipment reaches a terminal status [1]. This period cannot be shortened by customer request [1].</div>
+<div class="g"><b>Reference:</b> Shipment records are retained for 7 years after reaching a terminal status because of customs and freight-forwarding obligations, and that period cannot be shortened by customer request.</div>              <div class="g"><b>Grounding:</b> all claims supported</div>
+              <div class="g"><b>Judge:</b> The generated answer fully addresses the question and matches the reference answer exactly.</div>
+            <div class="g">
+              <b>Retrieved:</b>
+<span class="tag">[1] data-retention</span><span class="tag">[2] returns-policy</span><span class="tag">[3] data-retention</span><span class="tag">[4] returns-policy</span><span class="tag">[5] api-shipments</span>            </div>
+            <div class="g">
+              1393 ms &middot;
+              $0.00011 &middot;
+              748 tokens
+            </div>
+        </div>
+      </details>
+      <details>
+        <summary>
+          What happens after I delete a workspace, and how long until the data is actually gone?
+              <span class="tag ok">
+                faith 1.00
+              </span>
+        </summary>
+        <div class="qa">
+            <div class="a">After deletion, a 30-day soft-delete window begins during which an administrator can restore the workspace in full [1]. After that, purge jobs remove all data within a further 14 days, except 7-year shipment retention records, which are anonymised in place instead of deleted [1].</div>
+<div class="g"><b>Reference:</b> Deletion starts a 30-day soft-delete window during which an admin can fully restore it. After that, purge jobs remove all data within a further 14 days, except records under the 7-year shipment retention obligation, which are anonymised in place.</div>              <div class="g"><b>Grounding:</b> all claims supported</div>
+              <div class="g"><b>Judge:</b> The answer fully addresses the question and matches the reference answer exactly.</div>
+            <div class="g">
+              <b>Retrieved:</b>
+<span class="tag">[1] data-retention</span><span class="tag">[2] returns-policy</span><span class="tag">[3] api-webhooks</span><span class="tag">[4] customs-compliance</span><span class="tag">[5] deployment-release</span>            </div>
+            <div class="g">
+              1660 ms &middot;
+              $0.00011 &middot;
+              693 tokens
+            </div>
+        </div>
+      </details>
+      <details>
+        <summary>
+          What is the point-in-time recovery window, and how long are daily backups kept?
+              <span class="tag ok">
+                faith 1.00
+              </span>
+        </summary>
+        <div class="qa">
+            <div class="a">Point-in-time recovery is available for the most recent 7 days, and full daily backups are retained for 35 days [1].</div>
+<div class="g"><b>Reference:</b> Point-in-time recovery covers the most recent 7 days, and full daily backups are retained for 35 days.</div>              <div class="g"><b>Grounding:</b> all claims supported</div>
+              <div class="g"><b>Judge:</b> The answer fully addresses the question and matches the reference answer exactly.</div>
+            <div class="g">
+              <b>Retrieved:</b>
+<span class="tag">[1] data-retention</span><span class="tag">[2] data-retention</span><span class="tag">[3] security-access-policy</span><span class="tag">[4] onboarding-engineering</span><span class="tag">[5] data-retention</span>            </div>
+            <div class="g">
+              1476 ms &middot;
+              $0.00011 &middot;
+              753 tokens
+            </div>
+        </div>
+      </details>
+      <details>
+        <summary>
+          Which personal data fields are tokenised at ingest?
+              <span class="tag ok">
+                faith 1.00
+              </span>
+        </summary>
+        <div class="qa">
+            <div class="a">Consignee name, consignee phone number, and the second address line are tokenised at ingest [1].</div>
+<div class="g"><b>Reference:</b> Consignee name, consignee phone number, and the second address line are tokenised at ingest and stored only in the vault-backed token service.</div>              <div class="g"><b>Grounding:</b> all claims supported</div>
+              <div class="g"><b>Judge:</b> The generated answer lists the same three fields as the reference, fully addressing the question and matching the reference content.</div>
+            <div class="g">
+              <b>Retrieved:</b>
+<span class="tag">[1] data-retention</span><span class="tag">[2] observability-standards</span><span class="tag">[3] carrier-callbacks</span><span class="tag">[4] security-access-policy</span><span class="tag">[5] security-access-policy</span>            </div>
+            <div class="g">
+              1268 ms &middot;
+              $0.00008 &middot;
+              545 tokens
+            </div>
+        </div>
+      </details>
+      <details>
+        <summary>
+          What conditions trigger an automatic rollback during a canary deploy?
+              <span class="tag ok">
+                faith 1.00
+              </span>
+        </summary>
+        <div class="qa">
+            <div class="a">An automatic rollback triggers if the error rate exceeds 2% or p95 latency exceeds 800 ms during the 20-minute canary window [1].</div>
+<div class="g"><b>Reference:</b> During the 20 minute canary at 5% traffic, rollback triggers automatically if the error rate exceeds 2% or p95 latency exceeds 800 ms. It does not wait for human confirmation.</div>              <div class="g"><b>Grounding:</b> all claims supported</div>
+              <div class="g"><b>Judge:</b> The generated answer fully addresses the question and matches the reference answer, only omitting the note about human confirmation which is not a condition.</div>
+            <div class="g">
+              <b>Retrieved:</b>
+<span class="tag">[1] deployment-release</span><span class="tag">[2] capacity-planning</span><span class="tag">[3] deployment-release</span><span class="tag">[4] deployment-release</span><span class="tag">[5] api-webhooks</span>            </div>
+            <div class="g">
+              1536 ms &middot;
+              $0.00010 &middot;
+              649 tokens
+            </div>
+        </div>
+      </details>
+      <details>
+        <summary>
+          When are production deploys allowed, and when do change freezes apply?
+              <span class="tag ok">
+                faith 1.00
+              </span>
+        </summary>
+        <div class="qa">
+            <div class="a">Production deploys are allowed between 09:00 and 16:00 UTC, Monday to Thursday, with exceptions requiring Director of Engineering approval [1]. Change freezes apply on Fridays and during the last 3 business days of every quarter, allowing only incident mitigations [1].</div>
+<div class="g"><b>Reference:</b> Production deploys run between 09:00 and 16:00 UTC, Monday to Thursday. Change freezes apply on Fridays and during the last 3 business days of each quarter, when only incident mitigations ship.</div>              <div class="g"><b>Grounding:</b> all claims supported</div>
+              <div class="g"><b>Judge:</b> The answer fully addresses the question but adds an unverified detail about Director of Engineering approval not present in the reference.</div>
+            <div class="g">
+              <b>Retrieved:</b>
+<span class="tag">[1] deployment-release</span><span class="tag">[2] capacity-planning</span><span class="tag">[3] capacity-planning</span><span class="tag">[4] deployment-release</span><span class="tag">[5] mobile-driver-app</span>            </div>
+            <div class="g">
+              1325 ms &middot;
+              $0.00010 &middot;
+              660 tokens
+            </div>
+        </div>
+      </details>
+      <details>
+        <summary>
+          Can a single release both add a new column and drop the old one?
+              <span class="tag ok">
+                faith 1.00
+              </span>
+        </summary>
+        <div class="qa">
+            <div class="a">No. A single release must never contain both the expand and the contract phase; the destructive step that removes the old column ships in a later release [1].</div>
+<div class="g"><b>Reference:</b> No. Migrations follow expand-contract, and a single release must never contain both the expand and the contract phase; the destructive step ships in a later release.</div>              <div class="g"><b>Grounding:</b> all claims supported</div>
+              <div class="g"><b>Judge:</b> The answer directly addresses the question and fully matches the reference answer&#39;s reasoning.</div>
+            <div class="g">
+              <b>Retrieved:</b>
+<span class="tag">[1] deployment-release</span><span class="tag">[2] deployment-release</span><span class="tag">[3] returns-policy</span><span class="tag">[4] onboarding-engineering</span><span class="tag">[5] onboarding-engineering</span>            </div>
+            <div class="g">
+              1361 ms &middot;
+              $0.00011 &middot;
+              740 tokens
+            </div>
+        </div>
+      </details>
+      <details>
+        <summary>
+          What was the root cause of the 14 March 2026 webhook backlog incident?
+              <span class="tag ok">
+                faith 1.00
+              </span>
+        </summary>
+        <div class="qa">
+            <div class="a">The root cause was an unbounded prefetch on the `webhook-dispatch` consumer, which pulled too many messages into memory under a burst, causing garbage-collection pressure and collapsing throughput to about a third of nominal, so the queue grew faster than it drained [1].</div>
+<div class="g"><b>Reference:</b> The webhook-dispatch consumer had an unbounded prefetch. During a bulk import burst it pulled in more messages than it could process, hit sustained garbage-collection pressure, and throughput collapsed to about a third of nominal, so the queue grew faster than it drained. Depth peaked at 4,100,000 messages.</div>              <div class="g"><b>Grounding:</b> all claims supported</div>
+              <div class="g"><b>Judge:</b> The generated answer fully addresses the question and matches the reference answer in all key details.</div>
+            <div class="g">
+              <b>Retrieved:</b>
+<span class="tag">[1] postmortem-queue-backlog</span><span class="tag">[2] postmortem-queue-backlog</span><span class="tag">[3] postmortem-queue-backlog</span><span class="tag">[4] postmortem-tls-expiry</span><span class="tag">[5] postmortem-queue-backlog</span>            </div>
+            <div class="g">
+              1361 ms &middot;
+              $0.00012 &middot;
+              802 tokens
+            </div>
+        </div>
+      </details>
+      <details>
+        <summary>
+          How many workspaces were affected by the March 2026 backlog, and what was the worst delivery delay?
+              <span class="tag ok">
+                faith 1.00
+              </span>
+        </summary>
+        <div class="qa">
+            <div class="a">214 workspaces were affected, and the worst observed delay was 96 minutes [1].</div>
+<div class="g"><b>Reference:</b> 214 workspaces were affected and the worst observed delay was 96 minutes. No events were lost.</div>              <div class="g"><b>Grounding:</b> all claims supported</div>
+              <div class="g"><b>Judge:</b> The answer fully addresses the question and matches the reference answer exactly.</div>
+            <div class="g">
+              <b>Retrieved:</b>
+<span class="tag">[1] postmortem-queue-backlog</span><span class="tag">[2] postmortem-tls-expiry</span><span class="tag">[3] postmortem-queue-backlog</span><span class="tag">[4] postmortem-queue-backlog</span><span class="tag">[5] oncall-runbook</span>            </div>
+            <div class="g">
+              1379 ms &middot;
+              $0.00010 &middot;
+              709 tokens
+            </div>
+        </div>
+      </details>
+      <details>
+        <summary>
+          Why did no alert fire during the March 2026 queue backlog?
+              <span class="tag ok">
+                faith 1.00
+              </span>
+        </summary>
+        <div class="qa">
+            <div class="a">The queue-depth alert threshold at the time was not exceeded until the depth crossed 1,000,000 messages, but the queue crossed 800,000 at 11:26 and no alert fired [1][2]. The warn threshold of 250,000 and page threshold of 1,000,000 were only re-tiered after the incident, shipping on 18 March 2026 [5].</div>
+<div class="g"><b>Reference:</b> The queue-depth paging threshold was set at 5,000,000 messages, chosen when the queue was introduced and never revisited. The backlog peaked at 4,100,000, below that threshold, so on-call found out from a customer ticket instead.</div>              <div class="g"><b>Grounding:</b> all claims supported</div>
+              <div class="g"><b>Judge:</b> The generated answer partially addresses the question but contradicts the reference by stating incorrect thresholds (1,000,000 vs. 5,000,000) and misrepresenting the reason no alert fired.</div>
+            <div class="g">
+              <b>Retrieved:</b>
+<span class="tag">[1] postmortem-queue-backlog</span><span class="tag">[2] observability-standards</span><span class="tag">[3] postmortem-tls-expiry</span><span class="tag">[4] postmortem-queue-backlog</span><span class="tag">[5] postmortem-queue-backlog</span>            </div>
+            <div class="g">
+              1765 ms &middot;
+              $0.00014 &middot;
+              914 tokens
+            </div>
+        </div>
+      </details>
+      <details>
+        <summary>
+          What are the current queue-depth warn and page thresholds after the March 2026 incident?
+              <span class="tag ok">
+                faith 1.00
+              </span>
+        </summary>
+        <div class="qa">
+            <div class="a">The queue-depth warn threshold is 250,000 messages, and the page threshold is 1,000,000 messages [1][2].</div>
+<div class="g"><b>Reference:</b> Warn at 250,000 messages and page at 1,000,000 messages. The retiering was action item 2 from the 14 March 2026 postmortem and is also recorded in the observability standards.</div>              <div class="g"><b>Grounding:</b> all claims supported</div>
+              <div class="g"><b>Judge:</b> The answer directly provides the requested thresholds and matches the reference exactly.</div>
+            <div class="g">
+              <b>Retrieved:</b>
+<span class="tag">[1] observability-standards</span><span class="tag">[2] postmortem-queue-backlog</span><span class="tag">[3] postmortem-queue-backlog</span><span class="tag">[4] postmortem-queue-backlog</span><span class="tag">[5] postmortem-queue-backlog</span>            </div>
+            <div class="g">
+              1320 ms &middot;
+              $0.00013 &middot;
+              864 tokens
+            </div>
+        </div>
+      </details>
+      <details>
+        <summary>
+          What is the per-tenant cap on bulk shipment imports?
+              <span class="tag ok">
+                faith 1.00
+              </span>
+        </summary>
+        <div class="qa">
+            <div class="a">The per-tenant bulk import cap is 50,000 shipments per hour [1].</div>
+<div class="g"><b>Reference:</b> 50,000 shipments per hour, added as action item 3 after the March 2026 backlog incident.</div>              <div class="g"><b>Grounding:</b> all claims supported</div>
+              <div class="g"><b>Judge:</b> The answer directly states the cap and matches the reference, omitting only the non-essential context about the incident.</div>
+            <div class="g">
+              <b>Retrieved:</b>
+<span class="tag">[1] postmortem-queue-backlog</span><span class="tag">[2] postmortem-queue-backlog</span><span class="tag">[3] postmortem-queue-backlog</span><span class="tag">[4] pricing-billing</span><span class="tag">[5] pricing-billing</span>            </div>
+            <div class="g">
+              984 ms &middot;
+              $0.00011 &middot;
+              773 tokens
+            </div>
+        </div>
+      </details>
+  </div>
+
+  <h2>Full metric matrix</h2>
+  <div class="panel">
+    <table>
+      <thead>
+        <tr><th>Metric</th><th>hybrid-rrf</th><th>dense-only</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>arena_score</td>
+            <td>0.948</td>
+            <td>0.939</td>
+        </tr>
+        <tr>
+          <td>faithfulness</td>
+            <td>0.962</td>
+            <td>0.974</td>
+        </tr>
+        <tr>
+          <td>answer_correctness</td>
+            <td>0.942</td>
+            <td>0.952</td>
+        </tr>
+        <tr>
+          <td>answer_relevance</td>
+            <td>0.981</td>
+            <td>1.000</td>
+        </tr>
+        <tr>
+          <td>context_precision</td>
+            <td>0.894</td>
+            <td>0.809</td>
+        </tr>
+        <tr>
+          <td>hit_rate</td>
+            <td>1.000</td>
+            <td>1.000</td>
+        </tr>
+        <tr>
+          <td>doc_recall</td>
+            <td>1.000</td>
+            <td>1.000</td>
+        </tr>
+        <tr>
+          <td>precision@k</td>
+            <td>0.423</td>
+            <td>0.400</td>
+        </tr>
+        <tr>
+          <td>mrr</td>
+            <td>0.962</td>
+            <td>0.897</td>
+        </tr>
+        <tr>
+          <td>ndcg@k</td>
+            <td>0.941</td>
+            <td>0.882</td>
+        </tr>
+        <tr>
+          <td>citation_validity</td>
+            <td>0.968</td>
+            <td>0.981</td>
+        </tr>
+        <tr>
+          <td>citation_coverage</td>
+            <td>1.000</td>
+            <td>1.000</td>
+        </tr>
+        <tr>
+          <td>abstention_correct</td>
+            <td>1.000</td>
+            <td>1.000</td>
+        </tr>
+        <tr>
+          <td>chunks indexed</td>
+<td>134</td><td>134</td>        </tr>
+        <tr>
+          <td>errors</td>
+<td>0</td><td>0</td>        </tr>
+        <tr>
+          <td>eval cost (USD)</td>
+<td>0.0060</td><td>0.0062</td>        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer>
+    <p>
+      Generated by <b>RAGArena 0.1.0</b> on
+      Python 3.10.7 / Windows-10-10.0.26200-SP0.
+<br />Embedding provider comparison, local arm: BAAI/bge-small-en-v1.5 (384-dim, CPU ONNX) with no reranker, same 26 questions as the hosted Voyage arm. Only the embedding model differs between the two runs.    </p>
+    <p>
+      Latency percentiles exclude cache hits and were measured at concurrency
+      2 against the <code>memory</code>
+      index; CPU-bound local models contend with each other under parallelism, so read the
+      absolute milliseconds with that in mind. Serving cost covers query embedding, reranking,
+      query transformation and answer generation; judging is billed separately and shown in the
+      matrix above.
+    </p>
+  </footer>
+</div>
+</body>
+</html>
