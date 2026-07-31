@@ -1,8 +1,8 @@
 {
   "framework": "nextjs",
-  "buildCommand": "cd site && npm run build",
-  "installCommand": "cd site && npm ci",
-  "outputDirectory": "site/out",
+  "installCommand": "npm ci",
+  "buildCommand": "next build",
+  "outputDirectory": "out",
   "headers": [
     {
       "source": "/(.*)",
