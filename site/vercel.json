@@ -1,8 +1,5 @@
 {
   "framework": "nextjs",
-  "installCommand": "npm ci",
-  "buildCommand": "next build",
-  "outputDirectory": "out",
   "headers": [
     {
       "source": "/(.*)",
