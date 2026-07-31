@@ -60,10 +60,10 @@ all = [
 
 [project.urls]
 Homepage = "https://github.com/shahriar-ahmed-seam/ragarena"
-Documentation = "https://ragarena.vercel.app"
+Documentation = "https://shahriar-ahmed-seam.github.io/ragarena"
 Repository = "https://github.com/shahriar-ahmed-seam/ragarena"
 Issues = "https://github.com/shahriar-ahmed-seam/ragarena/issues"
-Leaderboard = "https://ragarena.vercel.app"
+Leaderboard = "https://shahriar-ahmed-seam.github.io/ragarena"
 
 [project.scripts]
 ragarena = "ragarena.cli:main"
@@ -87,7 +87,9 @@ select = ["E", "F", "I", "UP", "B", "C4", "SIM", "RUF"]
 ignore = ["E501", "B008", "RUF012"]
 
 [tool.mypy]
-python_version = "3.10"
+# Deliberately not pinning python_version: mypy then type-checks against the
+# running interpreter. Pinning it to 3.10 makes mypy reject the `type`
+# statements inside numpy's own stubs when running on 3.12+.
 warn_unused_ignores = false
 ignore_missing_imports = true
 disallow_untyped_defs = false
