@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import "./globals.css";
 
-const REPO = "https://github.com/shahriarseam17/ragarena";
+const REPO = "https://github.com/shahriar-ahmed-seam/ragarena";
 
 export const metadata: Metadata = {
   title: {
@@ -85,7 +85,7 @@ function Footer() {
             Built by{" "}
             <a
               className="text-accent-2 hover:underline"
-              href="https://github.com/shahriarseam17"
+              href="https://github.com/shahriar-ahmed-seam"
               target="_blank"
               rel="noreferrer noopener"
             >

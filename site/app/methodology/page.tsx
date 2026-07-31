@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     "How RAGArena measures RAG pipelines: metrics, the judge, latency, cost accounting, and what the numbers do not tell you.",
 };
 
-const REPO = "https://github.com/shahriarseam17/ragarena";
+const REPO = "https://github.com/shahriar-ahmed-seam/ragarena";
 
 function Block({
   title,

@@ -33,7 +33,7 @@ function Hero({ runs }: { runs: number }) {
           <span>{RUN}</span>
         </div>
         <a
-          href="https://github.com/shahriarseam17/ragarena"
+          href="https://github.com/shahriar-ahmed-seam/ragarena"
           target="_blank"
           rel="noreferrer noopener"
           className="rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-bg transition-opacity hover:opacity-90"

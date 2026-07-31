@@ -59,10 +59,10 @@ all = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/shahriarseam17/ragarena"
+Homepage = "https://github.com/shahriar-ahmed-seam/ragarena"
 Documentation = "https://ragarena.vercel.app"
-Repository = "https://github.com/shahriarseam17/ragarena"
-Issues = "https://github.com/shahriarseam17/ragarena/issues"
+Repository = "https://github.com/shahriar-ahmed-seam/ragarena"
+Issues = "https://github.com/shahriar-ahmed-seam/ragarena/issues"
 Leaderboard = "https://ragarena.vercel.app"
 
 [project.scripts]

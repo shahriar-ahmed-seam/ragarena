@@ -2,7 +2,7 @@
 
 **Head-to-head benchmarking for RAG pipelines.** Retrieval quality, answer faithfulness, latency and cost — measured in one run, on your own corpus, and written out as a leaderboard you can commit to git.
 
-[![CI](https://github.com/shahriarseam17/ragarena/actions/workflows/ci.yml/badge.svg)](https://github.com/shahriarseam17/ragarena/actions/workflows/ci.yml)
+[![CI](https://github.com/shahriar-ahmed-seam/ragarena/actions/workflows/ci.yml/badge.svg)](https://github.com/shahriar-ahmed-seam/ragarena/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/ragarena.svg)](https://pypi.org/project/ragarena/)
 [![Python](https://img.shields.io/pypi/pyversions/ragarena.svg)](https://pypi.org/project/ragarena/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)

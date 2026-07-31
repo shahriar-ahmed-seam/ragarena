@@ -3,7 +3,7 @@ name: Publish to PyPI
 # Fires when a release is published, or manually. Uses PyPI Trusted Publishing
 # (OIDC) so no long-lived token is stored in the repository. Configure the
 # publisher once at https://pypi.org/manage/project/ragarena/settings/publishing/
-# with: owner=shahriarseam17, repo=ragarena, workflow=publish.yml, environment=pypi
+# with: owner=shahriar-ahmed-seam, repo=ragarena, workflow=publish.yml, environment=pypi
 #
 # To use an API token instead, add PYPI_API_TOKEN as a secret and set
 # `password: ${{ secrets.PYPI_API_TOKEN }}` on the publish step.
