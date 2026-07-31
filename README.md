@@ -7,7 +7,7 @@
 [![Python](https://img.shields.io/pypi/pyversions/ragarena.svg)](https://pypi.org/project/ragarena/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> Live leaderboard: **https://shahriar-ahmed-seam.github.io/ragarena**
+> Live leaderboard: **https://ragarena.vercel.app** (mirror: [GitHub Pages](https://shahriar-ahmed-seam.github.io/ragarena/))
 
 ---
 

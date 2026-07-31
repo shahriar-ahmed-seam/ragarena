@@ -2,7 +2,7 @@
 
 Four committed runs on the bundled `meridian` corpus (20 documents, 7,088 words, 78 labelled questions, 11 of them unanswerable). Generator `deepseek-v4-flash`, judge `deepseek-v4-pro`, both with thinking mode disabled at temperature 0.
 
-Every number below is in [`results/`](../results/) and rendered on [the live leaderboard](https://shahriar-ahmed-seam.github.io/ragarena/). Absolute values are corpus-specific; the rankings are the transferable part.
+Every number below is in [`results/`](../results/) and rendered on [the live leaderboard](https://ragarena.vercel.app). Absolute values are corpus-specific; the rankings are the transferable part.
 
 ---
 
