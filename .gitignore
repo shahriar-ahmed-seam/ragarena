@@ -25,7 +25,10 @@ env/
 *.sqlite
 *.sqlite-wal
 *.sqlite-shm
-runs/
+# Anchored to the repo root on purpose: an unanchored `runs/` would also match
+# site/app/runs/, which silently dropped the leaderboard's run pages from a
+# commit and shipped a site with dead links.
+/runs/
 *.local.json
 _*.log
 
